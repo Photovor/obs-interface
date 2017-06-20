@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+      <title>OBS Interface</title>
+    <style type="text/css">
+        body{
+          background:linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ),url("background.jpg") no-repeat;
+          background-size: 100%;
+          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+            overflow:hidden;
+        }
+
+        .button{
+            font-weight:bold;
+            color: #FFFFFF;
+            float:left;
+            font-size:24px;
+            padding-top:20px;
+            border:1px solid #FFFFFF;
+            width:70px;
+            height:50px;
+            border-radius:10px;
+            background-color: #5d93cb;
+            text-align:center;
+            margin:5px;
+
+            -webkit-user-select: none; /* Chrome/Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+ */
+
+            /* Rules below not implemented in browsers yet */
+            -o-user-select: none;
+            user-select: none;
+        }
+
+        #numbers{
+            clear:both;
+        }
+
+        #row1{
+            margin-left:20px;
+            clear:both;
+        }
+
+        #row2{
+            clear:both;
+            margin-left:40px;
+        }
+
+        #row3{
+            clear:both;
+            margin-left:60px;
+        }
+
+
+
+        .backspace{
+            font-weight:bold;
+            color: #FFFFFF;
+            float:left;
+            font-size:24px;
+            padding-top:20px;
+            border:1px solid #FFFFFF;
+            width:150px;
+            height:50px;
+            border-radius:10px;
+            background-color: #d00000;
+            text-align:center;
+            margin:5px;
+
+            -webkit-user-select: none; /* Chrome/Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+ */
+
+            /* Rules below not implemented in browsers yet */
+            -o-user-select: none;
+            user-select: none;
+        }
+
+        #keyboard-input{
+            height:100px;
+            width:600px;
+            background-color:#FFFFFF;
+            border:2px solid #000000;
+            font-size:72px;
+            color:#000000;
+            padding-top:10px;
+            padding-left:20px;
+            border-radius:15px;
+            text-align: center;
+            float:left;
+        }
+
+        #input-container{
+            clear:both;
+            position:relative;
+            left:500px;
+            top:100px;
+        }
+
+        #keyboard{
+            clear:both;
+            position:relative;
+            left:475px;
+            top:110px;
+        }
+
+        #explainer-text{
+            color:#FFFFFF;
+            font-size:60px;
+            font-weight:bold;
+            text-align: center;
+            margin-left: auto ;
+            margin-right: auto ;
+            margin-top:25px;
+        }
+
+        #go-button{
+            height:100px;
+            width:150px;
+            border:2px solid #000000;
+            font-weight:bold;
+            font-size:72px;
+            text-align: center;
+            background-color: #00e200;
+            float:left;
+            border-radius:15px;
+            padding-top:10px;
+            margin-left:20px;
+        }
+
+    #visit-container{
+        color: #FFFFFF;
+        font-size:48px;
+        position:absolute;
+        top:800px;
+        left:200px;
+        font-weight:bold;
+    }
+
+        .yellow{
+            color: #e2d70f;
+        }
+
+        .larger{
+            font-size:1.4em;
+        }
+
+    </style>
+  </head>
+  <body>
+
+  <div id="explainer-text">Enter your Juniata College username to start a session.<br>Be sure to enter it correctly</div>
+
+<div id="input-container">
+    <div id="keyboard-input"></div>
+    <div id="go-button">GO</div>
+</div>
+
+
+    <div id="keyboard">
+      <div id="numbers">
+          <div class="button">1</div>
+          <div class="button">2</div>
+          <div class="button">3</div>
+          <div class="button">4</div>
+          <div class="button">5</div>
+          <div class="button">6</div>
+          <div class="button">7</div>
+          <div class="button">8</div>
+          <div class="button">9</div>
+          <div class="button">0</div>
+      </div><br>
+      <div id="row1">
+          <div class="button">q</div>
+          <div class="button">w</div>
+          <div class="button">e</div>
+          <div class="button">r</div>
+          <div class="button">t</div>
+          <div class="button">y</div>
+          <div class="button">u</div>
+          <div class="button">i</div>
+          <div class="button">o</div>
+          <div class="button">p</div>
+      </div>
+      <div id="row2">
+          <div class="button">a</div>
+          <div class="button">s</div>
+          <div class="button">d</div>
+          <div class="button">f</div>
+          <div class="button">g</div>
+          <div class="button">h</div>
+          <div class="button">j</div>
+          <div class="button">k</div>
+          <div class="button">l</div>
+      </div>
+      <div id="row3">
+          <div class="button">z</div>
+          <div class="button">x</div>
+          <div class="button">c</div>
+          <div class="button">v</div>
+          <div class="button">b</div>
+          <div class="button">n</div>
+          <div class="button">m</div>
+          <div class="backspace">DELETE</div>
+      </div>
+    </div>
+
+<div id="visit-container">
+  <span class="">Visit <span class="larger yellow">http://simplified.juniata.edu</span> to retrieve your videos.</span>
+</div>
+
+    <script type="text/javascript" src="jquery-1.11.2/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript">
+        var keyboardInput = $("#keyboard-input");
+
+        $(".button").on("click",function(){
+            var button = $(this).text();
+            keyboardInput.append(button);
+        });
+
+        $(".backspace").on("click", function(){
+            var textinput = keyboardInput.text().slice(0,-1);
+            keyboardInput.text(textinput);
+        });
+
+        $("#go-button").on("click", function(){
+            if(keyboardInput.text() == ""){
+                alert("You must enter a username first!");
+            }else{
+                var d = new Date();
+                window.location="start.html?username=" + keyboardInput.text() + "&time=" + d.getTime();
+
+
+            }
+        });
+
+
+
+
+
+    </script>
+  </body>
+</html>

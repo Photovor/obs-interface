@@ -1,0 +1,643 @@
+<?php
+if($_GET['username'] != null){
+    $username = $_GET['username'];
+    if(file_exists("../videos/$username") == false){
+        mkdir("../videos/$username");
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+      <title>OBS Interface</title>
+    <style type="text/css">
+        body{
+          background:linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ),url("background.jpg") no-repeat;
+          background-size: 100%;
+          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+            padding:0px;
+            margin:0px;
+        }
+
+        #air-status{
+            font-size: 92px;
+            font-weight:bold;
+            padding-top:20px;
+            width:550px;
+            height:120px;
+            border:10px solid #a1a1a1;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            border-top-right-radius: 20px;
+            text-align:center;
+            margin-left: auto ;
+            margin-right: auto ;
+            position:absolute;
+            top:210px;
+            left:1200px;
+
+        }
+
+        #air-status.off-air{
+            background-color: #760000;
+            color: #cfcfcf;
+        }
+
+        #air-status.on-air{
+            background-color: #ff0000;
+            color: #FFFFFF;
+        }
+
+        #recording-time{
+            position:absolute;
+            font-weight:bold;
+            width:700px;
+            color:#ffffff;
+            text-align: center;
+            text-shadow: 2px 2px #000000;
+            /*margin-left: auto ;
+            margin-right: auto ;*/
+            left:1130px;
+            top:390px;
+        }
+
+        #recording-numbers{
+            font-size: 150px;
+        }
+
+        #recording-text{
+            font-size:70px;
+        }
+
+
+
+        #camera-buttons{
+            width:100%;
+            color: #cdcdcd;
+        }
+
+        #scene-buttons-container{
+            margin-top:50px;
+            width:95%;
+            color: #FFFFFF;
+            font-weight:bold;
+            font-size:24px;
+            margin-left:10px;
+        }
+
+        #scene-options-container{
+            width:95%;
+            color: #FFFFFF;
+            font-weight:bold;
+            font-size:24px;
+            margin-left:10px;
+        }
+
+        #main-cameras-container{
+            width:95%;
+            color: #FFFFFF;
+            font-weight:bold;
+            font-size:24px;
+            margin-left:10px;
+        }
+
+        #scene-buttons{
+            width:100%;
+            min-height:150px;
+        }
+
+        .button-selected{
+            border-width: 5px;
+            border-color: #ff0063;
+        }
+
+        #log-out-button{
+            height:75px;
+            width:320px;
+            border:5px solid #000000;
+            font-size:48px;
+            position: relative;
+            left: 1500px;
+            top:-95px;
+            border-radius:20px;
+            background-color: #00e200;
+            color: #000000;
+            padding-top:25px;
+            text-align:center;
+        }
+
+        #explainer-box{
+            width:100%;
+            height:90px;
+            overflow:hidden;
+            margin-top:0;
+            margin-bottom:50px;
+            font-size:60px;
+            font-weight:bold;
+            color:#FFFFFF;
+            text-align: center;
+            background-color: rgba(255,255,255,0.2);
+            padding-top:35px;
+        }
+
+        #last-video-container{
+            border: none;
+            width: 550px;
+            height:314px;
+            position: absolute;
+            top:660px;
+            left:1210px;
+            display:none;
+        }
+
+        #video-text{
+            text-align:center;
+            width:100%;
+            color:#FFFFFF;
+            font-weight:bold;
+        }
+
+        #play-pause{
+            border-radius:3px;
+            height:50px;
+            width:100px;
+            background-color: #288e47;
+            color:#FFFFFF;
+            font-size:24px;
+            font-weight:bold;
+        }
+        #seek-bar{
+            width:350px;
+        }
+
+        #video-controls{
+            margin-top:-55px;
+            position:relative;
+            float:left;
+            z-index:1000;
+            left:20px;
+
+        }
+
+    </style>
+  </head>
+  <body>
+
+
+  <!-- Some introductory text -->
+  <div id="explainer-box">Logged In As: <?php echo $username; ?>
+
+    <div id="log-out-button">End Session</div>
+
+  </div>
+
+  <!-- ON/OFF Air Status -->
+    <div id="air-status" class="off-air">OFF AIR</div>
+
+    <div id="main-cameras-container">
+         Primary Cameras (Tap to Select)
+        <div id="camera-buttons"></div>
+    </div>
+
+    <!-- Scene buttons are hidden/shown based on whichever camera is selected -->
+    <div id="scene-buttons-container">
+        Scene Options (Tap to Select)
+        <div id="scene-buttons"></div>
+    </div>
+
+    <!-- These options will always show -->
+  <div id="scene-options-container">
+      Overlay Options (Tap On / Tap Off)
+      <div id="scene-options"></div>
+  </div>
+
+  <!-- Recording times -->
+  <div id="recording-time"><span id="recording-text">Recording Time</span><br><span id="recording-numbers">00:00:00</span></div>
+
+  <div id="last-video-container">
+      <video width="540" height="304" id="video-block">
+          <source id="video-source" src="" type="video/mp4">
+      </video>
+      <!-- Video Controls -->
+      <div id="video-controls">
+          <button type="button" id="play-pause">Play</button>
+          <input type="range" id="seek-bar" value="0" min="0">
+      </div>
+      <div id="video-text">Your Last Recording</div>
+  </div>
+
+
+
+
+    <script type="text/javascript" src="jquery-1.11.2/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="config.js"></script>
+
+    <script type="text/javascript">
+        // Apply the configuration
+        $.each(studio_configuration.cameras,function(camera,settings){
+            // Create the camera buttons
+
+            cam_button_code = "<button data-camera='" + settings.camera_id + "' class='camera-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:24px; font-weight:bold; margin:25px; width:250px; height:200px; border-radius:10px; ";
+                if(settings.button_color != ""){
+                    cam_button_code += "background-color: " + settings.button_color;
+                }
+                if(settings.thumbnail != ""){
+                    cam_button_code += "background-size: 100% auto; background: url(" + settings.thumbnail + ");";
+                }
+            cam_button_code += "'>";
+            cam_button_code += settings.button_name;
+            cam_button_code += "</button>";
+
+            $("#camera-buttons").append(cam_button_code);
+
+
+            // Create the scene buttons for each camera
+            if(Object.keys(settings.sources).length !== 0){
+                NumLayers = 0;
+                $("#scene-buttons").append("<div class='scene-buttons' id='" + settings.camera_id + "-scenes' style='display:none;'></div>");
+                $("#scene-options").append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'></div>");
+
+                $.each(settings.sources, function(scene, source_info){
+                    if(source_info.type == "layer") {
+                        NumLayers++;
+                        scene_button = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:18px; font-weight:bold; margin:25px; width:175px; height:100px; border-radius:10px; ";
+                        if (source_info.button_color != "") {
+                            scene_button += "background-color: " + source_info.button_color;
+                        }
+                        if (source_info.thumbnail != "") {
+                            scene_button += "background-repeat: no-repeat; background: url(" + source_info.thumbnail + ");";
+                        }
+                        scene_button += "'>";
+
+                        scene_button += source_info.source_name;
+                        scene_button += "</button>";
+                        $("#" + settings.camera_id + "-scenes").append(scene_button);
+                    }else if(source_info.type =="overlay"){
+                        option_code = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:18px; font-weight:bold; margin:25px; width:175px; height:100px; border-radius:10px; ";
+                        if(source_info.button_color != ""){
+                            option_code += "background-color: " + source_info.button_color;
+                        }
+                        if(source_info.thumbnail != ""){
+                            option_code += "background-repeat: no-repeat; background: url(" + source_info.thumbnail + ");";
+                        }
+                        option_code += "'>";
+
+                        option_code += source_info.source_name;
+
+                        option_code += "</button>";
+                        $("#" + settings.camera_id + "-options").append(option_code);
+                    }
+
+
+
+                });
+
+                if(NumLayers == 0 || Object.keys(settings.sources).length == 0){
+                    $("#" + settings.camera_id + "-scenes").append("<div style='margin-left:25px; padding-top:25px; color:#d00000;'>No additional scene options</div>");
+                }
+            }else{
+                $("#scene-buttons").append("<div class='scene-buttons' id='" + settings.camera_id + "-scenes' style='display:none;'><div style='margin-left:25px; padding-top:25px; color:#d00000;'>No additional scene options</div></div>");
+                $("#scene-options").append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'><div style='margin-left:25px; padding-top:25px;color:#d00000;'>No additional display options</div></div>");
+            }
+
+
+        });
+
+
+
+        // only one camera can be selected as the primary source
+        $(".camera-button").on("click", function(){
+            $(".scene-buttons").hide();
+            $(".camera-button").removeClass("button-selected");
+            $(this).addClass("button-selected");
+            camera_id = $(this).attr("data-camera");
+            $(".scene-options").hide();
+            $("#" + camera_id + "-scenes").show();
+            $("#" + camera_id + "-options").show();
+        });
+
+
+
+
+
+
+    </script>
+
+
+  <script type='text/javascript' src='obs-websocket-js.js'></script>
+    <script>
+        var username = "<?php echo $_GET['username']; ?>";
+
+
+        // Buttons
+       // var playButton = document.getElementById("play-pause");
+        var playButton = $("#play-pause");
+        // Sliders
+        var seekBar = document.getElementById("seek-bar");
+
+        var video = document.getElementById("video-block");
+
+
+
+        
+
+        video.addEventListener('ended', function(e){
+          $(playButton).text("Play");
+           $("#seek-bar").val("0");
+        });
+
+        video.addEventListener('currentTime', function(e){
+            $("#seek-bar").val(video.currentTime);
+        });
+
+        $("#video-block").on(
+          "timeupdate", 
+          function(event){
+            $("#seek-bar").val(this.currentTime);
+          });
+        
+
+
+        // Event listener for the play/pause button
+        $(playButton).on("click", function() {
+            if (video.paused == true) {
+                // Play the video
+                video.play();
+
+                // Update the button text to 'Pause'
+                $(playButton).text("Pause");
+            } else {
+                // Pause the video
+                video.pause();
+                // Update the button text to 'Play'
+                $(playButton).text("Play");
+
+            }
+        });
+
+        // Event listener for the seek bar
+        seekBar.addEventListener("change", function() {
+            // Calculate the new time
+            var vidtime = seekBar.value;
+
+            // Update the video time
+            video.currentTime = vidtime;
+        });
+
+
+
+        var recordingNumbers = document.getElementById('recording-numbers')[0],
+            seconds = 0, minutes = 0, hours = 0,
+            t;
+
+        function add() {
+            seconds++;
+            if (seconds >= 60) {
+                seconds = 0;
+                minutes++;
+                if (minutes >= 60) {
+                    minutes = 0;
+                    hours++;
+                }
+            }
+
+            $("#recording-numbers").text((hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds));
+
+            timer();
+        }
+
+        function timer() {
+            t = setTimeout(add, 1000);
+        }
+
+
+     // localStorage.debug = 'obs-websocket-js:*';
+
+      var obs = new OBSWebSocket();
+      // var obs = new OBSWebSocket('localhost:4444', 'password');
+
+      // Note that this defaults to localhost:4444. You can open a new connection later by doing the following.
+      // obs = new OBSWebSocket('localhost:4444', 'password'); // Overwrite the object.
+      // obs.connect({ address: 'localhost'}); // Call the connect method directly.
+
+      // If the password was not passed in the constructor, call the following.
+      // obs.authenticate({ password: 'password' });
+      connection_status = obs.connect('localhost');
+
+
+      // Bind some methods.
+      obs.onConnectionOpened(function() {
+        console.log('Connection Opened - No guarantees that we are authenticated though!');
+       //   $.get("http://services2.juniata.edu/cts/simplified-studio/log.php",{log_text:"Opening Connection"});
+      });
+
+      obs.onAuthenticationSuccess(function(err, data) {
+        console.log('Authentication Success - Free to make any request.');
+       // $.get("http://services2.juniata.edu/cts/simplified-studio/log.php",{log_text:"Authentication Success"});
+
+          // set the recording directory
+          obs.send("SetRecordingFolder", {"rec-folder":"c:\\xampp\\htdocs\\videos\\" + username},function(err, data) {
+
+          });
+
+
+          //set the default scene
+          $.each(studio_configuration.cameras,function(camera,settings){
+              if(settings.default == true){
+                  cam_id = settings.camera_id;
+                  obs.send("SetCurrentScene", {"scene-name":cam_id},function(err, data) {
+
+                  });
+                  $(".camera-button[data-camera='" + cam_id + "']").click();
+              }
+          });
+
+        // Send some queries.
+       // obs.GetSceneList(null, function(err, data) {
+         // document.getElementById('scene_name').textContent = data['current-scene'];
+        //});
+
+        /*obs.GetSceneList()
+          .then((data) => {
+            console.log('GetSceneList Promise Resolve', data);
+          })
+          .catch((err) => {
+            console.log('GetSceneList Promise Reject', err);
+          });
+
+        obs.send('GetSceneList', {}, function(err, data) {
+          console.log(err, data);
+        })
+          .then((data) => {
+            console.log(data);
+          });*/
+      });
+
+      obs.onAuthenticationFailure(function(err, data) {
+        console.log('Authentication Failure.');
+         // $.get("http://services2.juniata.edu/cts/simplified-studio/log.php",{log_text:"Authentication Failure"});
+      });
+
+      obs.on('SwitchScenes', function(err, data) {
+        console.log('obs.on(SwitchScenes)', err, data);
+      });
+
+     /* obs.onSwitchScenes(function(err, data) {
+        console.log('obs.onSwitchScenes', err, data);
+          //$.get("http://services2.juniata.edu/cts/simplified-studio/log.php",{log_text:"Changed Scene: " + data.sceneName});
+
+          obs.send("GetCurrentScene", {}, function (err, data) {
+
+
+              $.each(data.sources, function (c, scn) {
+
+
+              });
+
+
+                //  console.log(data.sources);
+          });
+
+      });*/
+
+      obs.onRecordingStarted(function(err, data){
+          console.log("obs.onRecordingStarted");
+          $("#last-video-container").hide();
+          $("#air-status").addClass("on-air").removeClass("off-air").text("ON AIR");
+         // $.get("http://services2.juniata.edu/cts/simplified-studio/log.php",{log_text:"Recording Started"});
+
+          timer();
+      });
+
+        obs.onRecordingStopped(function(err, data){
+            console.log("obs.onRecordingStopped");
+           // $.get("http://services2.juniata.edu/cts/simplified-studio/log.php",{log_text:"Recording Stopped: " + $("#recording-numbers").text()});
+
+            clearTimeout(t);
+            $("#recording-numbers").text("00:00:00");
+            $("#air-status").addClass("off-air").removeClass("on-air").text("OFF AIR");
+
+            //get the last video and display it
+            $.get("get_last_video.php",{'username':username}, function(video_location){
+                
+                $("#video-source").attr("src", video_location);
+                $("#video-block").load();
+
+                var i = setInterval(function() {
+                  if(video.readyState > 0) {
+                    //var minutes = parseInt(video.duration / 60, 10);
+                    //var seconds = video.duration % 60;
+                      $("#seek-bar").attr("max", video.duration);
+                    // (Put the minutes and seconds in the display)
+                    $("#last-video-container").show();
+                    clearInterval(i);
+                  }
+                }, 200);
+
+
+            });
+
+
+
+
+
+        });
+
+
+
+        obs.onSceneItemVisibilityChanged(function(err,data){
+
+            if(data.itemVisible == true) {
+                $(".scene-button[data-source='" + data.itemName + "']").addClass("button-selected");
+            }else{
+                $(".scene-button[data-source='" + data.itemName + "']").removeClass("button-selected");
+            }
+
+        });
+
+
+
+        $(".scene-button").on("click", function(){
+            cam_id = $(this).attr("data-scene");
+            source_id = $(this).attr("data-source");
+            source_type = $(this).attr("data-type");
+
+            //set the scene
+            obs.send("SetCurrentScene", {"scene-name":cam_id},function(err, data) {
+                //alert(err.error);
+            });
+
+            if(source_type == "layer") {
+                //$(".scene-button").removeClass("button-selected");
+               // $(this).addClass("button-selected");
+
+                // hide all sources in the scene
+                $.each(studio_configuration.cameras[cam_id].sources, function (c, scn) {
+                    if(scn.type == "layer") {
+                        obs.send("SetSourceRender", {"source": scn.source_id, "render": false}, function (err, data) {
+                            //alert(err.error);
+                        });
+                    }
+                });
+
+                // enable the selected source
+                obs.send("SetSourceRender", {"source": source_id, "render": true}, function (err, data) {
+                   // alert(err.error);
+                });
+            }else if(source_type == "overlay"){
+                if($(this).hasClass("button-selected") == false){
+                  //  $(this).addClass("button-selected");
+
+                    // Render the layer
+                    obs.send("SetSourceRender", {"source": source_id, "render": true}, function (err, data) {
+                       // alert(err.error);
+                    });
+                }else{
+                   // $(this).removeClass("button-selected");
+
+                    // Hide the layer
+                    obs.send("SetSourceRender", {"source": source_id, "render": false}, function (err, data) {
+                        //alert(err.error);
+                    });
+                }
+
+            }
+        });
+
+
+
+        $(".camera-button").on("click", function(){
+            cam_id = $(this).attr("data-camera");
+
+            //set the scene
+            obs.send("SetCurrentScene", {"scene-name":cam_id},function(err, data) {
+               // alert(err.error);
+            });
+        });
+
+
+
+        $("#log-out-button").on("click", function(){
+            obs.send("StopRecording", {},function(err, data) {
+                // alert(err.error);
+            });
+           window.location = "complete.html";
+        });
+
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+
+  </body>
+</html>
