@@ -24,6 +24,13 @@ var studio_configuration = {
                     "thumbnail": "thumbnails/green-screen-camera-button.jpg",
                     "button_color": "",
                     "type" : "overlay"
+                },
+                "Juniata Logo":{
+                    "source_name" : "Juniata Logo",
+                    "source_id" : "juniata-logo",
+                    "thumbnail": "thumbnails/juniata-logo-button.jpg",
+                    "button_color": "",
+                    "type" : "overlay"
                 }
             }
         },
@@ -75,12 +82,12 @@ var studio_configuration = {
                     "button_color": "",
                     "type": "overlay"
                 },
-                "Grey Wall":{
-                    "source_name" : "Grey Wall Cam",
-                    "source_id" : "logitech-webcam",
-                    "thumbnail": "thumbnails/grey-wall-camera-button.jpg",
+                "Juniata Logo":{
+                    "source_name" : "Juniata Logo",
+                    "source_id" : "juniata-logo",
+                    "thumbnail": "thumbnails/juniata-logo-button.jpg",
                     "button_color": "",
-                    "type": "overlay"
+                    "type" : "overlay"
                 }
             }
         },
@@ -90,7 +97,6 @@ var studio_configuration = {
             "thumbnail": "thumbnails/hdmi-input-camera-button.jpg",
             "button_color": "",
             "sources": {
-
             }
         }
     }
