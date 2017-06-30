@@ -62,8 +62,6 @@ if($_GET['username'] != null){
             color:#ffffff;
             text-align: center;
             text-shadow: 2px 2px #000000;
-            /*margin-left: auto ;
-            margin-right: auto ;*/
             left:1130px;
             top:390px;
         }
@@ -243,6 +241,7 @@ if($_GET['username'] != null){
 
         var cameraButtons = $("#camera-buttons");
         var sceneButtons = $("#scene-buttons");
+        var sceneOptions = $("#scene-options");
 
         $.each(studio_configuration.cameras,function(camera,settings){
             // Create the camera buttons
@@ -270,7 +269,7 @@ if($_GET['username'] != null){
 
                 // Set up containers to hold the scenes and additional options, such as overlays
                 sceneButtons.append("<div class='scene-buttons' id='" + settings.camera_id + "-scenes' style='display:none;'></div>");
-                sceneButtons.append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'></div>");
+                sceneOptions.append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'></div>");
 
                 // Create buttons for the scenes and options
                 $.each(settings.sources, function(scene, source_info){
@@ -318,6 +317,7 @@ if($_GET['username'] != null){
 
     <script type="text/javascript">
         var username = "<?php echo $_GET['username']; ?>";
+
         var sceneButtons = $(".scene-buttons");
         var sceneButton = $(".scene-button");
         var cameraButton = $(".camera-button");
@@ -325,17 +325,13 @@ if($_GET['username'] != null){
 
         var seekBar = $("#seek-bar");
         var playButton = $("#play-pause");
-
         var video = $("#video-block");
 
         var airStatus = $("#air-status");
-
-        var lastVideoContainer = $("#last-video-container");
-
         var recordingNumbers = $("#recording-numbers");
         var seconds = 0, minutes = 0, hours = 0, t;
 
-
+        var lastVideoContainer = $("#last-video-container");
 
 
 
