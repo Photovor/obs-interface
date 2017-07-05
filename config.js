@@ -36,21 +36,14 @@ var studio_configuration = {
         },
         "green-screen-cam": {
             "camera_id": "green-screen-cam",
-            "button_name": "Green Screen Cam",
+            "button_name": "Green Screen",
             "thumbnail": "thumbnails/green-screen-camera-button.jpg",
             "button_color": "#00FF00",
             "sources": {
-                "scene 1": {
+                "island": {
                     "source_name": "Island",
-                    "source_id": "scene1",
+                    "source_id": "island",
                     "thumbnail": "thumbnails/scene-1.jpg",
-                    "button_color": "",
-                    "type": "layer"
-                },
-                "scene 2": {
-                    "source_name": "Studio",
-                    "source_id": "scene2",
-                    "thumbnail": "thumbnails/scene-2.jpg",
                     "button_color": "",
                     "type": "layer"
                 },
@@ -61,22 +54,37 @@ var studio_configuration = {
                     "button_color": "#000000",
                     "type": "layer"
                 },
-                "White": {
-                    "source_name": "White",
-                    "source_id": "white",
-                    "thumbnail": "",
-                    "button_color": "#FFFFFF",
+                "Cloister": {
+                    "source_name": "Cloister",
+                    "source_id": "cloister",
+                    "thumbnail": "thumbnails/cloister.jpg",
+                    "button_color": "#000000",
                     "type": "layer"
                 },
-                "Chroma Key": {
-                    "source_name": "Chroma Key",
-                    "source_id": "chroma-key",
-                    "thumbnail": "",
-                    "button_color": "#28e04a",
+                "Quad": {
+                    "source_name": "Quad",
+                    "source_id": "quad",
+                    "thumbnail": "thumbnails/quad.jpg",
+                    "button_color": "#000000",
+                    "type": "layer"
+                },
+                "founders-steps": {
+                    "source_name": "Founders Steps",
+                    "source_id": "founders-steps",
+                    "thumbnail": "thumbnails/founders-steps.jpg",
+                    "button_color": "#000000",
+                    "type": "layer"
+                },
+
+                "fountain-motion-1": {
+                    "source_name": "Founders Fountain",
+                    "source_id": "fountain-motion-1",
+                    "thumbnail": "thumbnails/founders-fountain.jpg",
+                    "button_color": "#000000",
                     "type": "layer"
                 },
                 "Computer Input":{
-                    "source_name" : "HDMI Input",
+                    "source_name" : "AUX Input",
                     "source_id" : "hdmi-2",
                     "thumbnail": "thumbnails/colorbars.jpg",
                     "button_color": "",
@@ -93,8 +101,16 @@ var studio_configuration = {
         },
         "full-screen-hdmi": {
             "camera_id": "full-screen-hdmi",
-            "button_name": "Full Screen HDMI",
-            "thumbnail": "thumbnails/hdmi-input-camera-button.jpg",
+            "button_name": "Full Screen AUX Input",
+            "thumbnail": "thumbnails/full-screen-aux.jpg",
+            "button_color": "",
+            "sources": {
+            }
+        },
+        "green-screen-fs-hdmi": {
+            "camera_id": "green-screen-fs-hdmi",
+            "button_name": "AUX Input as Green Screen",
+            "thumbnail": "thumbnails/greenscreen-aux.jpg",
             "button_color": "",
             "sources": {
             }
