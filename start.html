@@ -13,14 +13,14 @@ if($_GET['username'] != null){
 ?>
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8">
-      <title>OBS Interface</title>
+    <title>OBS Interface</title>
     <style type="text/css">
         body{
-          background:linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ),url("background.jpg") no-repeat;
-          background-size: 100%;
-          font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+            background:linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ),url("background.jpg") no-repeat;
+            background-size: 100%;
+            font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
             padding:0px;
             margin:0px;
         }
@@ -204,387 +204,400 @@ if($_GET['username'] != null){
         }
 
     </style>
-  </head>
-  <body>
+</head>
+<body>
 
 
-  <!-- Some introductory text -->
-  <div id="explainer-box">Logged In As: <?php echo $username; ?>
+<!-- Some introductory text -->
+<div id="explainer-box">Logged In As: <?php echo $username; ?>
     <div id="qrcode"></div>
     <div id="qrcode-text">Scan the QR Code<br>
-    for remote control app</div>
+        for remote control app</div>
     <div id="log-out-button">End Session</div>
 
-  </div>
+</div>
 
-  <!-- ON/OFF Air Status -->
-    <div id="air-status" class="off-air">OFF AIR</div>
+<!-- ON/OFF Air Status -->
+<div id="air-status" class="off-air">OFF AIR</div>
 
-    <div id="main-cameras-container">
-         Primary Cameras (Tap to Select)
-        <div id="camera-buttons"></div>
+<div id="main-cameras-container">
+    Primary Cameras (Tap to Select)
+    <div id="camera-buttons"></div>
+</div>
+
+<!-- Scene buttons are hidden/shown based on whichever camera is selected -->
+<div id="scene-buttons-container">
+    Scene Options (Tap to Select)
+    <div id="scene-buttons"></div>
+</div>
+
+<!-- These options will always show -->
+<div id="scene-options-container">
+    Overlay Options (Tap On / Tap Off)
+    <div id="scene-options"></div>
+</div>
+
+<!-- Recording times -->
+<div id="recording-time"><span id="recording-text">Recording Time</span><br><span id="recording-numbers">00:00:00</span></div>
+
+<div id="last-video-container">
+    <video width="540" height="304" id="video-block">
+        <source id="video-source" src="" type="video/mp4">
+    </video>
+    <!-- Video Controls -->
+    <div id="video-controls">
+        <button type="button" id="play-pause">Play</button>
+        <input type="range" id="seek-bar" value="0" min="0" />
     </div>
-
-    <!-- Scene buttons are hidden/shown based on whichever camera is selected -->
-    <div id="scene-buttons-container">
-        Scene Options (Tap to Select)
-        <div id="scene-buttons"></div>
-    </div>
-
-    <!-- These options will always show -->
-  <div id="scene-options-container">
-      Overlay Options (Tap On / Tap Off)
-      <div id="scene-options"></div>
-  </div>
-
-  <!-- Recording times -->
-  <div id="recording-time"><span id="recording-text">Recording Time</span><br><span id="recording-numbers">00:00:00</span></div>
-
-  <div id="last-video-container">
-      <video width="540" height="304" id="video-block">
-          <source id="video-source" src="" type="video/mp4">
-      </video>
-      <!-- Video Controls -->
-      <div id="video-controls">
-          <button type="button" id="play-pause">Play</button>
-          <input type="range" id="seek-bar" value="0" min="0" />
-      </div>
-      <div id="video-text">Your Last Recording</div>
-  </div>
+    <div id="video-text">Your Last Recording</div>
+</div>
 
 
 
 
-    <script type="text/javascript" src="jquery-1.11.2/jquery-1.11.2.min.js"></script>
-    <script type="text/javascript" src="davidshimjs-qrcodejs-04f46c6/qrcode.min.js"></script>
-    <script type="text/javascript" src="config.js"></script>
+<script type="text/javascript" src="jquery-1.11.2/jquery-1.11.2.min.js"></script>
+<<script type="text/javascript" src="davidshimjs-qrcodejs-04f46c6/qrcode.min.js"></script>
+<script type="text/javascript" src="config.js"></script>
 
-    <script type="text/javascript">
-        // Apply the configuration from the config.js file
+<script type="text/javascript">
+    // Apply the configuration from the config.js file
 
-        var cameraButtons = $("#camera-buttons");
-        var sceneButtons = $("#scene-buttons");
-        var sceneOptions = $("#scene-options");
+    var cameraButtons = $("#camera-buttons");
+    var sceneButtons = $("#scene-buttons");
+    var sceneOptions = $("#scene-options");
 
-        $.each(studio_configuration.cameras,function(camera,settings){
-            // Create the camera buttons
-            cam_button_code = "<button data-camera='" + settings.camera_id + "' class='camera-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:24px; font-weight:bold; margin:20px; width:250px; height:200px; border-radius:10px; overflow:hidden; vertical-align:middle;";
+    $.each(studio_configuration.cameras,function(camera,settings){
+        // Create the camera buttons
+        cam_button_code = "<button data-camera='" + settings.camera_id + "' class='camera-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:24px; font-weight:bold; margin:20px; width:250px; height:200px; border-radius:10px; overflow:hidden; vertical-align:middle;";
 
-                // If a color is just provided for the button, make the background of that button the solid color specified
-                if(settings.button_color != ""){
-                    cam_button_code += "background-color: " + settings.button_color;
+        // If a color is just provided for the button, make the background of that button the solid color specified
+        if(settings.button_color != ""){
+            cam_button_code += "background-color: " + settings.button_color;
+        }
+
+        // If a thumbnail is specified for a button, override the background-color and just use a background image
+        if(settings.thumbnail != ""){
+            cam_button_code += "background-size: 100% auto; background: url(" + settings.thumbnail + ");";
+        }
+        cam_button_code += "'>";
+        cam_button_code += settings.button_name;
+        cam_button_code += "</button>";
+
+        // Append the completed button to the container for all the camera buttons
+        cameraButtons.append(cam_button_code);
+
+        // Create the scene buttons for each camera
+        if(Object.keys(settings.sources).length !== 0){
+            NumLayers = 0;
+
+            // Set up containers to hold the scenes and additional options, such as overlays
+            sceneButtons.append("<div class='scene-buttons' id='" + settings.camera_id + "-scenes' style='display:none;'></div>");
+            sceneOptions.append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'></div>");
+
+            // Create buttons for the scenes and options
+            $.each(settings.sources, function(scene, source_info){
+                if(source_info.type == "layer"){
+                    NumLayers++;
+                    scene_button = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:18px; font-weight:bold; margin:25px; width:175px; height:100px; border-radius:10px; vertical-align:middle;";
+                    if (source_info.button_color != ""){ scene_button += "background-color: " + source_info.button_color; }
+                    if (source_info.thumbnail != ""){ scene_button += "background-repeat: no-repeat; background: url(" + source_info.thumbnail + ");"; }
+                    scene_button += "'>";
+
+                    scene_button += source_info.source_name;
+                    scene_button += "</button>";
+                    $("#" + settings.camera_id + "-scenes").append(scene_button);
+                }else if(source_info.type =="overlay"){
+                    option_code = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:18px; font-weight:bold; margin:25px; width:175px; height:100px; border-radius:10px; vertical-align:middle;";
+                    if(source_info.button_color != ""){ option_code += "background-color: " + source_info.button_color; }
+                    if(source_info.thumbnail != ""){ option_code += "background-repeat: no-repeat; background: url(" + source_info.thumbnail + ");"; }
+                    option_code += "'>";
+
+                    option_code += source_info.source_name;
+
+                    option_code += "</button>";
+                    $("#" + settings.camera_id + "-options").append(option_code);
                 }
+            });
 
-                // If a thumbnail is specified for a button, override the background-color and just use a background image
-                if(settings.thumbnail != ""){
-                    cam_button_code += "background-size: 100% auto; background: url(" + settings.thumbnail + ");";
-                }
-            cam_button_code += "'>";
-            cam_button_code += settings.button_name;
-            cam_button_code += "</button>";
+            // If there are no scene options, just display this
+            if(NumLayers == 0 || Object.keys(settings.sources).length == 0){
+                $("#" + settings.camera_id + "-scenes").append("<div style='margin-left:25px; padding-top:25px; color:#d00000;'>No additional scene options</div>");
+            }
+        }else{
+            // If there are no scene options, just display this
+            sceneButtons.append("<div class='scene-buttons' id='" + settings.camera_id + "-scenes' style='display:none;'><div style='margin-left:25px; padding-top:25px; color:#d00000;'>No additional scene options</div></div>");
+            sceneOptions.append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'><div style='margin-left:25px; padding-top:25px;color:#d00000;'>No additional display options</div></div>");
+        }
 
-            // Append the completed button to the container for all the camera buttons
-            cameraButtons.append(cam_button_code);
 
-            // Create the scene buttons for each camera
-            if(Object.keys(settings.sources).length !== 0){
-                NumLayers = 0;
+    });
 
-                // Set up containers to hold the scenes and additional options, such as overlays
-                sceneButtons.append("<div class='scene-buttons' id='" + settings.camera_id + "-scenes' style='display:none;'></div>");
-                sceneOptions.append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'></div>");
 
-                // Create buttons for the scenes and options
-                $.each(settings.sources, function(scene, source_info){
-                    if(source_info.type == "layer"){
-                        NumLayers++;
-                        scene_button = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:18px; font-weight:bold; margin:25px; width:175px; height:100px; border-radius:10px; vertical-align:middle;";
-                            if (source_info.button_color != ""){ scene_button += "background-color: " + source_info.button_color; }
-                            if (source_info.thumbnail != ""){ scene_button += "background-repeat: no-repeat; background: url(" + source_info.thumbnail + ");"; }
-                        scene_button += "'>";
+</script>
 
-                        scene_button += source_info.source_name;
-                        scene_button += "</button>";
-                        $("#" + settings.camera_id + "-scenes").append(scene_button);
-                    }else if(source_info.type =="overlay"){
-                        option_code = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:18px; font-weight:bold; margin:25px; width:175px; height:100px; border-radius:10px; vertical-align:middle;";
-                            if(source_info.button_color != ""){ option_code += "background-color: " + source_info.button_color; }
-                            if(source_info.thumbnail != ""){ option_code += "background-repeat: no-repeat; background: url(" + source_info.thumbnail + ");"; }
-                        option_code += "'>";
+<!-- Incude the OBS Websocket API -->
+<script type='text/javascript' src='obs-websocket-js.js'></script>
 
-                        option_code += source_info.source_name;
+<script type="text/javascript">
+    var username = "<?php echo $_GET['username']; ?>";
+    var qr_code_text = "<?php echo base64_encode($username); ?>";
 
-                        option_code += "</button>";
-                        $("#" + settings.camera_id + "-options").append(option_code);
-                    }
+    var sceneButtons = $(".scene-buttons");
+    var sceneButton = $(".scene-button");
+    var cameraButton = $(".camera-button");
+    var sceneOptions = $(".scene-options");
+    /*
+     var seekBar = $("#seek-bar");
+     var playButton = $("#play-pause");
+     var video = $("#video-block");*/
+
+    var airStatus = $("#air-status");
+    var recordingNumbers = $("#recording-numbers");
+    var seconds = 0, minutes = 0, hours = 0, t;
+
+    var lastVideoContainer = $("#last-video-container");
+
+
+    new QRCode(document.getElementById("qrcode"), {
+        text: "http://services2.juniata.edu/qr.php?c=" + qr_code_text,
+        width: 110,
+        height: 110});
+
+
+    // Buttons
+    var playButton = document.getElementById("play-pause");
+    // Sliders
+    var seekBar = document.getElementById("seek-bar");
+
+    var video = document.getElementById("video-block");
+
+
+    video.addEventListener('ended', function(e){
+        playButton.innerHTML = "Play";
+        $("#seek-bar").val("0");
+    });
+
+    video.addEventListener('currentTime', function(e){
+        $("#seek-bar").val(video.currentTime);
+    });
+
+    $("#video-block").on(
+        "timeupdate",
+        function(event){
+            $("#seek-bar").val(this.currentTime);
+        })
+
+
+    // Event listener for the play/pause button
+    playButton.addEventListener("click", function() {
+        if (video.paused == true) {
+            // Play the video
+            video.play();
+
+            // Update the button text to 'Pause'
+            playButton.innerHTML = "Pause";
+        } else {
+            // Pause the video
+            video.pause();
+            // Update the button text to 'Play'
+            playButton.innerHTML = "Play";
+        }
+    });
+
+    // Event listener for the seek bar
+    seekBar.addEventListener("change", function() {
+        // Calculate the new time
+        var vidtime = seekBar.value;
+
+        // Update the video time
+        video.currentTime = vidtime;
+    });
+
+
+    function add() {
+        seconds++;
+        if (seconds >= 60) {
+            seconds = 0;
+            minutes++;
+            if (minutes >= 60) {
+                minutes = 0;
+                hours++;
+            }
+        }
+        // formats the recording times into Hours : Minutes : Seconds
+        recordingNumbers.text((hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds));
+        timer();
+    }
+
+    function timer() {
+        t = setTimeout(add, 1000);
+    }
+    localStorage.debug = 'obs-websocket-js:*';
+
+    var obs = new OBSWebSocket();
+    // var obs = new OBSWebSocket('localhost:4444', 'password');
+
+    // Note that this defaults to localhost:4444. You can open a new connection later by doing the following.
+    // obs = new OBSWebSocket('localhost:4444', 'password'); // Overwrite the object.
+    // obs.connect({ address: 'localhost'}); // Call the connect method directly.
+
+    // If the password was not passed in the constructor, call the following.
+    // obs.authenticate({ password: 'password' });
+    connection_status = obs.connect('localhost');
+
+
+    // Some of these commented bits are purely for logging purposes only.
+    obs.onConnectionOpened(function() {
+        console.log('Connection Opened - No guarantees that we are authenticated though!');
+    });
+
+    obs.onAuthenticationSuccess(function (err, data) {
+        // We're now connected
+        // set the recording directory based on the passed username
+        obs.send("SetRecordingFolder", {"rec-folder": "c:\\xampp\\htdocs\\videos\\" + username}, function (err, data) {
+        });
+
+        //set the default scene by finding which has the default property set to true
+        $.each(studio_configuration.cameras, function (camera, settings) {
+            if (settings.default == true) {
+                cam_id = settings.camera_id;
+                obs.send("SetCurrentScene", {"scene-name": cam_id}, function (err, data) {
                 });
-
-                // If there are no scene options, just display this
-                if(NumLayers == 0 || Object.keys(settings.sources).length == 0){
-                    $("#" + settings.camera_id + "-scenes").append("<div style='margin-left:25px; padding-top:25px; color:#d00000;'>No additional scene options</div>");
-                }
-            }else{
-                // If there are no scene options, just display this
-                sceneButtons.append("<div class='scene-buttons' id='" + settings.camera_id + "-scenes' style='display:none;'><div style='margin-left:25px; padding-top:25px; color:#d00000;'>No additional scene options</div></div>");
-                sceneOptions.append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'><div style='margin-left:25px; padding-top:25px;color:#d00000;'>No additional display options</div></div>");
-            }
-
-
-        });
-
-
-    </script>
-
-    <!-- Incude the OBS Websocket API -->
-    <script type='text/javascript' src='obs-websocket-js.js'></script>
-
-    <script type="text/javascript">
-        var username = "<?php echo $_GET['username']; ?>";
-        var qr_code_text = "<?php echo base64_encode($username); ?>";
-
-        var sceneButtons = $(".scene-buttons");
-        var sceneButton = $(".scene-button");
-        var cameraButton = $(".camera-button");
-        var sceneOptions = $(".scene-options");
-
-        var seekBar = $("#seek-bar");
-        var playButton = $("#play-pause");
-        var video = $("#video-block");
-
-        var airStatus = $("#air-status");
-        var recordingNumbers = $("#recording-numbers");
-        var seconds = 0, minutes = 0, hours = 0, t;
-
-        var lastVideoContainer = $("#last-video-container");
-
-
-        new QRCode(document.getElementById("qrcode"), {
-            text: "http://services2.juniata.edu/qr.php?c=" + qr_code_text,
-            width: 110,
-            height: 110});
-
-
-        video.on('ended', function(e){
-          playButton.text("Play");
-          seekBar.val("0");
-        });
-
-        video.on('currentTime', function(e){
-            seekBar.val(video.currentTime);
-        });
-
-        video.on("timeupdate", function(event){
-            seekBar.val(this.currentTime);
-        });
-        
-
-        // Event listener for the play/pause button
-        playButton.on("click", function() {
-            if (video.paused == true) {
-                // Play the video
-                video.play();
-
-                // Update the button text to 'Pause'
-                playButton.text("Pause");
-            } else {
-                // Pause the video
-                video.pause();
-                // Update the button text to 'Play'
-                playButton.text("Play");
-
+                $(".camera-button[data-camera='" + cam_id + "']").click();
             }
         });
+    });
 
-        // Event listener for the seek bar
-        seekBar.on("change", function() {
-            // Update the video time
-            video.currentTime = seekBar.value;
-        });
-
-
-        function add() {
-            seconds++;
-            if (seconds >= 60) {
-                seconds = 0;
-                minutes++;
-                if (minutes >= 60) {
-                    minutes = 0;
-                    hours++;
-                }
-            }
-            // formats the recording times into Hours : Minutes : Seconds
-            recordingNumbers.text((hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds));
-            timer();
-        }
-
-        function timer() {
-            t = setTimeout(add, 1000);
-        }
-        localStorage.debug = 'obs-websocket-js:*';
-
-        var obs = new OBSWebSocket();
-        // var obs = new OBSWebSocket('localhost:4444', 'password');
-
-        // Note that this defaults to localhost:4444. You can open a new connection later by doing the following.
-        // obs = new OBSWebSocket('localhost:4444', 'password'); // Overwrite the object.
-        // obs.connect({ address: 'localhost'}); // Call the connect method directly.
-
-        // If the password was not passed in the constructor, call the following.
-        // obs.authenticate({ password: 'password' });
-        connection_status = obs.connect('localhost');
+    obs.onAuthenticationFailure(function(err, data) {
+        // helpful to know if the authentication failed to OBS
+        console.log('Authentication Failure.');
+    });
 
 
-        // Some of these commented bits are purely for logging purposes only.
-        obs.onConnectionOpened(function() {
-            console.log('Connection Opened - No guarantees that we are authenticated though!');
-        });
+    obs.onRecordingStarted(function(err, data){
+        // Hide the last video container if it's displayed
+        lastVideoContainer.hide();
 
-        obs.onAuthenticationSuccess(function (err, data) {
-            // We're now connected
-            // set the recording directory based on the passed username
-            obs.send("SetRecordingFolder", {"rec-folder": "c:\\xampp\\htdocs\\videos\\" + username}, function (err, data) {
-            });
+        // Show ON AIR
+        airStatus.addClass("on-air").removeClass("off-air").text("ON AIR");
 
-            //set the default scene by finding which has the default property set to true
-            $.each(studio_configuration.cameras, function (camera, settings) {
-                if (settings.default == true) {
-                    cam_id = settings.camera_id;
-                    obs.send("SetCurrentScene", {"scene-name": cam_id}, function (err, data) {
-                    });
-                    $(".camera-button[data-camera='" + cam_id + "']").click();
-                }
-            });
-        });
+        // Start the Recording Timer
+        timer();
+    });
 
-        obs.onAuthenticationFailure(function(err, data) {
-            // helpful to know if the authentication failed to OBS
-            console.log('Authentication Failure.');
-        });
+    obs.onRecordingStopped(function(err, data){
+        // Stop the Recording Timer
+        clearTimeout(t);
 
+        // reset the Recording Time Numbers
+        recordingNumbers.text("00:00:00");
 
-        obs.onRecordingStarted(function(err, data){
-            // Hide the last video container if it's displayed
-            lastVideoContainer.hide();
+        // Show OFF AIR
+        airStatus.addClass("off-air").removeClass("on-air").text("OFF AIR");
 
-            // Show ON AIR
-            airStatus.addClass("on-air").removeClass("off-air").text("ON AIR");
+        // Get the last video and display it
+        // This GET request will return the last video (based on timestamp, and user) that
+        // was recorded
+        d = new Date();
+        $.get("get_last_video.php",{'username':username, 'time':d.getTime()}, function(video_location){
+            // change the src attribute on the video to the latest one
 
-            // Start the Recording Timer
-            timer();
-        });
+            $("#video-source").attr("src", video_location);
+            $("#video-block").load();
 
-        obs.onRecordingStopped(function(err, data){
-            // Stop the Recording Timer
-            clearTimeout(t);
-
-            // reset the Recording Time Numbers
-            recordingNumbers.text("00:00:00");
-
-            // Show OFF AIR
-            airStatus.addClass("off-air").removeClass("on-air").text("OFF AIR");
-
-            // Get the last video and display it
-            // This GET request will return the last video (based on timestamp, and user) that
-            // was recorded
-            $.get("get_last_video.php",{'username':username}, function(video_location){
-                // change the src attribute on the video to the latest one
-                $("#video-source").attr("src", video_location);
-
-                // load the video
-                video.load();
-
-                // When the video is loaded update the progress slider to be the duration of the video
-                // We have a 200 ms loop here to catch this when the video is loaded
-                var i = setInterval(function() {
-                  if(video.readyState > 0) {
-                      $("#seek-bar").attr("max", video.duration);
-                    lastVideoContainer.show();
+            var i = setInterval(function() {
+                if(video.readyState > 0) {
+                    //var minutes = parseInt(video.duration / 60, 10);
+                    //var seconds = video.duration % 60;
+                    $("#seek-bar").attr("max", video.duration);
+                    // (Put the minutes and seconds in the display)
+                    $("#last-video-container").show();
                     clearInterval(i);
-                  }
-                }, 200);
-            });
-        });
-
-
-
-        obs.onSceneItemVisibilityChanged(function(err,data){
-            // When something in the scene changes change the class of the associated button
-            if(data.itemVisible == true) {
-                $(".scene-button[data-source='" + data.itemName + "']").addClass("button-selected");
-            }else{
-                $(".scene-button[data-source='" + data.itemName + "']").removeClass("button-selected");
-            }
-        });
-
-
-
-        sceneButton.on("click", function(){
-            cam_id = $(this).attr("data-scene");
-            source_id = $(this).attr("data-source");
-            source_type = $(this).attr("data-type");
-
-            //set the scene
-            obs.send("SetCurrentScene", {"scene-name":cam_id},function(err, data) { });
-
-            if(source_type == "layer") {
-                // hide all sources in the scene
-                $.each(studio_configuration.cameras[cam_id].sources, function (c, scn) {
-                    if(scn.type == "layer") {
-                        obs.send("SetSourceRender", {"source": scn.source_id, "render": false}, function (err, data) { });
-                    }
-                });
-
-                // enable the selected source
-                obs.send("SetSourceRender", {"source": source_id, "render": true}, function (err, data) { });
-            }else if(source_type == "overlay"){
-                if($(this).hasClass("button-selected") == false){
-                    // Render the layer
-                    obs.send("SetSourceRender", {"source": source_id, "render": true}, function (err, data) { });
-                    $(this).addClass("button-selected");
-                }else{
-                    // Hide the layer
-                    obs.send("SetSourceRender", {"source": source_id, "render": false}, function (err, data) { });
-                    $(this).removeClass("button-selected");
                 }
+            }, 200);
+        });
+    });
+
+
+
+    obs.onSceneItemVisibilityChanged(function(err,data){
+        // When something in the scene changes change the class of the associated button
+        if(data.itemVisible == true) {
+            $(".scene-button[data-source='" + data.itemName + "']").addClass("button-selected");
+        }else{
+            $(".scene-button[data-source='" + data.itemName + "']").removeClass("button-selected");
+        }
+    });
+
+
+
+    sceneButton.on("click", function(){
+        cam_id = $(this).attr("data-scene");
+        source_id = $(this).attr("data-source");
+        source_type = $(this).attr("data-type");
+
+        //set the scene
+        obs.send("SetCurrentScene", {"scene-name":cam_id},function(err, data) { });
+
+        if(source_type == "layer") {
+            // hide all sources in the scene
+            $.each(studio_configuration.cameras[cam_id].sources, function (c, scn) {
+                if(scn.type == "layer") {
+                    obs.send("SetSourceRender", {"source": scn.source_id, "render": false}, function (err, data) { });
+                }
+            });
+
+            // enable the selected source
+            obs.send("SetSourceRender", {"source": source_id, "render": true}, function (err, data) { });
+        }else if(source_type == "overlay"){
+            if($(this).hasClass("button-selected") == false){
+                // Render the layer
+                obs.send("SetSourceRender", {"source": source_id, "render": true}, function (err, data) { });
+                $(this).addClass("button-selected");
+            }else{
+                // Hide the layer
+                obs.send("SetSourceRender", {"source": source_id, "render": false}, function (err, data) { });
+                $(this).removeClass("button-selected");
             }
-        });
+        }
+    });
 
 
 
-        cameraButton.on("click", function(){
-            camera_id = $(this).attr("data-camera");
+    cameraButton.on("click", function(){
+        camera_id = $(this).attr("data-camera");
 
-            // Hide all the scene and overlay buttons
-            sceneButtons.hide();
-            sceneOptions.hide();
+        // Hide all the scene and overlay buttons
+        sceneButtons.hide();
+        sceneOptions.hide();
 
-            // Take the hilighting off all the camera buttons
-            cameraButton.removeClass("button-selected");
+        // Take the hilighting off all the camera buttons
+        cameraButton.removeClass("button-selected");
 
-            // Just hilight the clicked camera button
-            $(this).addClass("button-selected");
+        // Just hilight the clicked camera button
+        $(this).addClass("button-selected");
 
-            // Show the associated scene and overlay buttons
-            $("#" + camera_id + "-scenes").show();
-            $("#" + camera_id + "-options").show();
+        // Show the associated scene and overlay buttons
+        $("#" + camera_id + "-scenes").show();
+        $("#" + camera_id + "-options").show();
 
-            //switch to the scene
-            obs.send("SetCurrentScene", {"scene-name":camera_id},function(err, data) {});
-        });
-
-
-
-        $("#log-out-button").on("click", function(){
-            // Make sure to stop a recording if they click the End Session button
-            obs.send("StopRecording", {},function(err, data) { });
-
-            // Redirect them to the complete page
-            window.location = "complete.html";
-        });
-    </script>
+        //switch to the scene
+        obs.send("SetCurrentScene", {"scene-name":camera_id},function(err, data) {});
+    });
 
 
 
+    $("#log-out-button").on("click", function(){
+        // Make sure to stop a recording if they click the End Session button
+        obs.send("StopRecording", {},function(err, data) { });
 
-  </body>
+        // Redirect them to the complete page
+        window.location = "complete.html";
+    });
+</script>
+
+
+
+
+</body>
 </html>
