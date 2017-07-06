@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Simplified Studio Remote Control</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style type="text/css">
+        body{
+            background-color:#000000;
+            color:#FFFFFF;
+        }
+
+        .btn{
+            margin:15px;
+            border:1px solid #FFFFFF;
+            height:75px;
+            min-width:100px;
+            max-width:150px;
+            white-space: normal !important;
+            color: #FFFFFF;
+        }
+
+        .button-selected{
+            border-width: 5px;
+            border-color: #ff0063;
+        }
+    </style>
+</head>
+<body>
+    <div class="row">
+        <div class="col-xs-12 text-center" id="authentication-status"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            Primary Cameras
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="camera-buttons"></div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            Scene Options
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="scene-buttons"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            Overlay Options
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="scene-options"></div>
+        </div>
+    </div>
+
+
+
+
+
+
+<script type="text/javascript" src="jquery-1.11.2/jquery-1.11.2.min.js"></script>
+<script type='text/javascript' src='obs-websocket-js.js'></script>
+    <script type="text/javascript" src="config.js"></script>
+<script type="text/javascript">
+    var sceneButton = $(".scene-button");
+    var cameraButton = $(".camera-button");
+
+    const obs = new OBSWebSocket();
+
+    obs.connect({ address: '10.1.4.70:4444'})
+        .then(() => {
+        $("#authentication-status").text("CONNECTED TO STUDIO");
+        populateScenes();
+    })
+    .catch(err => { // Ensure that you add a catch handler to every Promise chain.
+        $("#authentication-status").text("UNABLE TO CONNECT");
+    });
+
+    function populateScenes(){
+        var cameraButtons = $("#camera-buttons");
+        var sceneButtons = $("#scene-buttons");
+        var sceneOptions = $("#scene-options");
+
+
+
+        $.each(studio_configuration.cameras,function(camera,settings){
+            // Create the camera buttons
+            cam_button_code = "<button data-camera='" + settings.camera_id + "' class='camera-button btn btn-lg btn-info' style='";
+
+            // If a thumbnail is specified for a button, override the background-color and just use a background image
+            if(settings.thumbnail != ""){
+                cam_button_code += " background: url(" + settings.thumbnail + "); background-size: cover; background-repeat: no-repeat;";
+            }
+            cam_button_code += "'>";
+            cam_button_code += settings.button_name;
+            cam_button_code += "</button>";
+
+            // Append the completed button to the container for all the camera buttons
+            cameraButtons.append(cam_button_code);
+
+            // Create the scene buttons for each camera
+            if(Object.keys(settings.sources).length !== 0){
+                NumLayers = 0;
+
+                // Set up containers to hold the scenes and additional options, such as overlays
+                sceneButtons.append("<div class='scene-buttons' id='" + settings.camera_id + "-scenes' style='display:none;'></div>");
+                sceneOptions.append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'></div>");
+
+                // Create buttons for the scenes and options
+                $.each(settings.sources, function(scene, source_info){
+                    if(source_info.type == "layer"){
+                        NumLayers++;
+                        scene_button = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button btn' style='";
+                        if (source_info.thumbnail != ""){ scene_button += "background-repeat: no-repeat; background: url(" + source_info.thumbnail + ");"; }
+                        if (source_info.button_color != ""){ scene_button += "background-color: " + source_info.button_color; }
+                        scene_button += "'>";
+                        scene_button += source_info.source_name;
+                        scene_button += "</button>";
+                        $("#" + settings.camera_id + "-scenes").append(scene_button);
+                    }else if(source_info.type =="overlay"){
+                        option_code = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button btn' style='";
+                        if(source_info.thumbnail != ""){ option_code += " background: url(" + source_info.thumbnail + "); background-size: contain; background-repeat: no-repeat;"; }
+                        if (source_info.button_color != ""){ option_code += "background-color: " + source_info.button_color; }
+                        option_code += "'>";
+                        option_code += source_info.source_name;
+                        option_code += "</button>";
+                        $("#" + settings.camera_id + "-options").append(option_code);
+                    }
+                });
+
+                // If there are no scene options, just display this
+                if(NumLayers == 0 || Object.keys(settings.sources).length == 0){
+                    $("#" + settings.camera_id + "-scenes").append("<div style='margin-left:25px; padding-top:25px; color:#d00000;'>No additional scene options</div>");
+                }
+            }else{
+                // If there are no scene options, just display this
+                sceneButtons.append("<div class='scene-buttons' id='" + settings.camera_id + "-scenes' style='display:none;'><div style='margin-left:25px; padding-top:25px; color:#d00000;'>No additional scene options</div></div>");
+                sceneOptions.append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'><div style='margin-left:25px; padding-top:25px;color:#d00000;'>No additional display options</div></div>");
+            }
+
+
+        });
+    }
+
+    $(document).on("click", ".camera-button", function(){
+        camera_id = $(this).attr("data-camera");
+
+        // Hide all the scene and overlay buttons
+        $(".scene-buttons").hide();
+        $(".scene-options").hide();
+
+        // Take the hilighting off all the camera buttons
+        cameraButton.removeClass("button-selected");
+
+        // Just hilight the clicked camera button
+        $(this).addClass("button-selected");
+
+
+        // Show the associated scene and overlay buttons
+        $("#" + camera_id + "-scenes").show();
+        $("#" + camera_id + "-options").show();
+
+        //switch to the scene
+        obs.send("SetCurrentScene", {"scene-name":camera_id},function(err, data) {});
+    });
+
+    $(document).on("click", ".scene-button", function(){
+        cam_id = $(this).attr("data-scene");
+        source_id = $(this).attr("data-source");
+        source_type = $(this).attr("data-type");
+
+        //set the scene
+        obs.send("SetCurrentScene", {"scene-name":cam_id},function(err, data) { });
+
+        if(source_type == "layer") {
+            // hide all sources in the scene
+            $.each(studio_configuration.cameras[cam_id].sources, function (c, scn) {
+                if(scn.type == "layer") {
+                    obs.send("SetSourceRender", {"source": scn.source_id, "render": false}, function (err, data) { });
+                }
+            });
+
+            // enable the selected source
+            obs.send("SetSourceRender", {"source": source_id, "render": true}, function (err, data) { });
+        }else if(source_type == "overlay"){
+            if($(this).hasClass("button-selected") == false){
+                // Render the layer
+                obs.send("SetSourceRender", {"source": source_id, "render": true}, function (err, data) { });
+                $(this).addClass("button-selected");
+            }else{
+                // Hide the layer
+                obs.send("SetSourceRender", {"source": source_id, "render": false}, function (err, data) { });
+                $(this).removeClass("button-selected");
+            }
+        }
+    });
+
+
+
+
+</script>
+
+</body>
+</html>
