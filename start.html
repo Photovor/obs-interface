@@ -106,8 +106,9 @@ if($_GET['username'] != null){
         }
 
         #scene-buttons{
-            width:100%;
+            max-width:1200px;
             min-height:150px;
+
         }
 
         .button-selected{
@@ -245,7 +246,7 @@ if($_GET['username'] != null){
 
         $.each(studio_configuration.cameras,function(camera,settings){
             // Create the camera buttons
-            cam_button_code = "<button data-camera='" + settings.camera_id + "' class='camera-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:24px; font-weight:bold; margin:25px; width:250px; height:200px; border-radius:10px; ";
+            cam_button_code = "<button data-camera='" + settings.camera_id + "' class='camera-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:24px; font-weight:bold; margin:20px; width:250px; height:200px; border-radius:10px; overflow:hidden; vertical-align:middle;";
 
                 // If a color is just provided for the button, make the background of that button the solid color specified
                 if(settings.button_color != ""){
@@ -275,7 +276,7 @@ if($_GET['username'] != null){
                 $.each(settings.sources, function(scene, source_info){
                     if(source_info.type == "layer"){
                         NumLayers++;
-                        scene_button = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:18px; font-weight:bold; margin:25px; width:175px; height:100px; border-radius:10px; ";
+                        scene_button = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:18px; font-weight:bold; margin:25px; width:175px; height:100px; border-radius:10px; vertical-align:middle;";
                             if (source_info.button_color != ""){ scene_button += "background-color: " + source_info.button_color; }
                             if (source_info.thumbnail != ""){ scene_button += "background-repeat: no-repeat; background: url(" + source_info.thumbnail + ");"; }
                         scene_button += "'>";
@@ -284,7 +285,7 @@ if($_GET['username'] != null){
                         scene_button += "</button>";
                         $("#" + settings.camera_id + "-scenes").append(scene_button);
                     }else if(source_info.type =="overlay"){
-                        option_code = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:18px; font-weight:bold; margin:25px; width:175px; height:100px; border-radius:10px; ";
+                        option_code = "<button data-scene='" + settings.camera_id + "' data-source='" + source_info.source_id + "' data-type='" + source_info.type + "' class='scene-button' style='color: #FFFFFF; text-shadow: 4px 4px 2px rgba(0, 0, 0, 1); font-size:18px; font-weight:bold; margin:25px; width:175px; height:100px; border-radius:10px; vertical-align:middle;";
                             if(source_info.button_color != ""){ option_code += "background-color: " + source_info.button_color; }
                             if(source_info.thumbnail != ""){ option_code += "background-repeat: no-repeat; background: url(" + source_info.thumbnail + ");"; }
                         option_code += "'>";
@@ -303,7 +304,7 @@ if($_GET['username'] != null){
             }else{
                 // If there are no scene options, just display this
                 sceneButtons.append("<div class='scene-buttons' id='" + settings.camera_id + "-scenes' style='display:none;'><div style='margin-left:25px; padding-top:25px; color:#d00000;'>No additional scene options</div></div>");
-                sceneButtons.append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'><div style='margin-left:25px; padding-top:25px;color:#d00000;'>No additional display options</div></div>");
+                sceneOptions.append("<div class='scene-options' id='" + settings.camera_id + "-options' style='display:none;'><div style='margin-left:25px; padding-top:25px;color:#d00000;'>No additional display options</div></div>");
             }
 
 
@@ -391,7 +392,7 @@ if($_GET['username'] != null){
         function timer() {
             t = setTimeout(add, 1000);
         }
-
+        localStorage.debug = 'obs-websocket-js:*';
 
         var obs = new OBSWebSocket();
         // var obs = new OBSWebSocket('localhost:4444', 'password');
@@ -511,9 +512,11 @@ if($_GET['username'] != null){
                 if($(this).hasClass("button-selected") == false){
                     // Render the layer
                     obs.send("SetSourceRender", {"source": source_id, "render": true}, function (err, data) { });
+                    $(this).addClass("button-selected");
                 }else{
                     // Hide the layer
                     obs.send("SetSourceRender", {"source": source_id, "render": false}, function (err, data) { });
+                    $(this).removeClass("button-selected");
                 }
             }
         });
