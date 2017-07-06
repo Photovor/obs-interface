@@ -121,9 +121,9 @@ if($_GET['username'] != null){
             width:320px;
             border:5px solid #000000;
             font-size:48px;
-            position: relative;
+            position: absolute;
             left: 1500px;
-            top:-95px;
+            top:10px;
             border-radius:20px;
             background-color: #00e200;
             color: #000000;
@@ -184,6 +184,25 @@ if($_GET['username'] != null){
 
         }
 
+        #qrcode{
+            position:absolute;
+            left: 5px;
+            top:5px;
+            width:110px;
+            height:110px;
+            background-color:#FFFFFF;
+            border:2px solid #FFFFFF;
+        }
+        #qrcode-text{
+            position:absolute;
+            left: 115px;
+            top:30px;
+            width:100px;
+            height:75px;
+            color: #FFFFFF;
+            font-size:14px;
+        }
+
     </style>
   </head>
   <body>
@@ -191,7 +210,9 @@ if($_GET['username'] != null){
 
   <!-- Some introductory text -->
   <div id="explainer-box">Logged In As: <?php echo $username; ?>
-
+    <div id="qrcode"></div>
+    <div id="qrcode-text">Scan the QR Code<br>
+    for remote control app</div>
     <div id="log-out-button">End Session</div>
 
   </div>
@@ -235,6 +256,7 @@ if($_GET['username'] != null){
 
 
     <script type="text/javascript" src="jquery-1.11.2/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="davidshimjs-qrcodejs-04f46c6/qrcode.min.js"></script>
     <script type="text/javascript" src="config.js"></script>
 
     <script type="text/javascript">
@@ -318,6 +340,7 @@ if($_GET['username'] != null){
 
     <script type="text/javascript">
         var username = "<?php echo $_GET['username']; ?>";
+        var qr_code_text = "<?php echo base64_encode($username); ?>";
 
         var sceneButtons = $(".scene-buttons");
         var sceneButton = $(".scene-button");
@@ -334,6 +357,11 @@ if($_GET['username'] != null){
 
         var lastVideoContainer = $("#last-video-container");
 
+
+        new QRCode(document.getElementById("qrcode"), {
+            text: "http://services2.juniata.edu/qr.php?c=" + qr_code_text,
+            width: 110,
+            height: 110});
 
 
         video.on('ended', function(e){
