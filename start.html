@@ -385,7 +385,7 @@ if($_GET['username'] != null){
         "timeupdate",
         function(event){
             $("#seek-bar").val(this.currentTime);
-        })
+    });
 
 
     // Event listener for the play/pause button
@@ -536,6 +536,7 @@ if($_GET['username'] != null){
         source_id = $(this).attr("data-source");
         source_type = $(this).attr("data-type");
 
+
         //set the scene
         obs.send("SetCurrentScene", {"scene-name":cam_id},function(err, data) { });
 
@@ -567,6 +568,10 @@ if($_GET['username'] != null){
     cameraButton.on("click", function(){
         camera_id = $(this).attr("data-camera");
 
+        var mutedSources = studio_configuration.cameras[camera_id].mute;
+        var unmutedSources = studio_configuration.cameras[camera_id].unmute;
+
+
         // Hide all the scene and overlay buttons
         sceneButtons.hide();
         sceneOptions.hide();
@@ -583,6 +588,15 @@ if($_GET['username'] != null){
 
         //switch to the scene
         obs.send("SetCurrentScene", {"scene-name":camera_id},function(err, data) {});
+        $.each(mutedSources, function (id,audioSource) {
+            obs.send("SetMute", {"source":audioSource,"mute":true},function(err, data) {});
+        });
+
+        $.each(unmutedSources, function (id,audioSource) {
+            obs.send("SetMute", {"source":audioSource, "mute":false},function(err, data) {});
+        });
+
+
     });
 
 
@@ -594,6 +608,10 @@ if($_GET['username'] != null){
         // Redirect them to the complete page
         window.location = "complete.html";
     });
+
+
+
+
 </script>
 
 
