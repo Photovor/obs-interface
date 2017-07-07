@@ -4,7 +4,7 @@
 
 var studio_configuration = {
     "cameras":{
-        "grey-wall-camera": {
+        "grey-wall-cam": {
             "camera_id": "grey-wall-cam",
             "button_name": "Grey Wall Cam",
             "thumbnail": "thumbnails/grey-wall-camera-button.jpg",
@@ -32,7 +32,9 @@ var studio_configuration = {
                     "button_color": "",
                     "type" : "overlay"
                 }
-            }
+            },
+            "mute":["Mic/Aux 2"],
+            "unmute": ["Mic/Aux"]
         },
         "green-screen-cam": {
             "camera_id": "green-screen-cam",
@@ -97,7 +99,9 @@ var studio_configuration = {
                     "button_color": "",
                     "type" : "overlay"
                 }
-            }
+            },
+            "mute":["Mic/Aux"],
+            "unmute": ["Mic/Aux 2"]
         },
         "full-screen-hdmi": {
             "camera_id": "full-screen-hdmi",
@@ -105,7 +109,9 @@ var studio_configuration = {
             "thumbnail": "thumbnails/full-screen-aux.jpg",
             "button_color": "",
             "sources": {
-            }
+            },
+            "mute":["Mic/Aux"],
+            "unmute": ["Mic/Aux 2"]
         },
         "green-screen-fs-hdmi": {
             "camera_id": "green-screen-fs-hdmi",
@@ -113,7 +119,9 @@ var studio_configuration = {
             "thumbnail": "thumbnails/greenscreen-aux.jpg",
             "button_color": "",
             "sources": {
-            }
+            },
+            "mute":["Mic/Aux"],
+            "unmute": ["Mic/Aux 2"]
         }
     }
 
